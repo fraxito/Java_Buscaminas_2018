@@ -22,6 +22,7 @@ public class Boton extends JButton{
         i = _i;
         j = _j;
         this.setBorder(null);
+        this.setFocusPainted(false);
     }
 
     public int getJ() {
