@@ -45,8 +45,8 @@ public class VentanaBuscaminas extends javax.swing.JFrame {
                 });
             }
         }
-        
         ponMinas(30);
+        cuentaMinas();
     }
     
     private void botonPulsado(MouseEvent e){
@@ -67,6 +67,39 @@ public class VentanaBuscaminas extends javax.swing.JFrame {
             arrayBotones[f][c].setMina(1);
             arrayBotones[f][c].setText("m");
         }
+    }
+    
+    //cuentaMinas es un método que para cada botón calcula el número de minas
+    //que tiene alrededor
+    private void cuentaMinas(){
+        //TODO falta por hacer que calcule las minas en el borde exterior
+        int minas = 0;
+        for (int i=0; i<filas; i++){
+            for (int j=0; j<columnas; j++){
+                if ((i>0) && (j>0) && (i < filas-1) && (j<columnas-1)){
+                    minas += arrayBotones[i-1][j-1].getMina(); //la mina de arriba a la izquierda
+                    minas += arrayBotones[i][j-1].getMina(); //la mina de la izquierda
+                    minas += arrayBotones[i+1][j-1].getMina(); //la mina de la abajo izquierda 
+                    
+                    minas += arrayBotones[i-1][j].getMina(); //la mina de encima 
+                    minas += arrayBotones[i+1][j].getMina(); //la mina de abajo 
+ 
+                    minas += arrayBotones[i-1][j+1].getMina(); //la mina de arriba a la derecha
+                    minas += arrayBotones[i][j+1].getMina(); //la mina de la derecha
+                    minas += arrayBotones[i+1][j+1].getMina(); //la mina de la abajo derecha
+                }
+                arrayBotones[i][j].setNumeroMinasAlrededor(minas);
+                
+                //TODO comentar la siguiente parte para que no aparezcan los números al iniciar la partida
+                if (arrayBotones[i][j].getMina() == 0){
+                    arrayBotones[i][j].setText(String.valueOf(minas));
+                }
+                
+                minas = 0;
+            }
+        }
+        
+    
     }
 
     /**
