@@ -55,7 +55,8 @@ public class VentanaBuscaminas extends javax.swing.JFrame {
         if (e.getButton() == MouseEvent.BUTTON3){
             miBoton.setText("?");
         }
-//                else{
+//                else{ //versión ITERATIVA del buscaminas. Esta versión NO se puede entregar
+                        // porque tienes que entregar la RECURSIVA
 //           //Si es una bomba --> Explota y se acaba el juego.
 //            
 //            //Si no es una bomba
