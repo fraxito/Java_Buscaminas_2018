@@ -6,11 +6,15 @@
 package codigo;
 
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
-import javax.swing.JButton;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.Timer;
 
 /**
  *
@@ -20,6 +24,7 @@ public class VentanaBuscaminas extends javax.swing.JFrame {
 
     int filas = 15; 
     int columnas = 20;
+    int numeroMinas = 30;
     
     
     Boton [][] arrayBotones = new Boton[filas][columnas];
@@ -30,12 +35,12 @@ public class VentanaBuscaminas extends javax.swing.JFrame {
      */
     public VentanaBuscaminas() {
         initComponents();
-        setSize(800, 600);
+        setSize(27*columnas , 29*filas);
         getContentPane().setLayout(new GridLayout(filas, columnas));
         for (int i=0; i<filas; i++){
             for (int j=0; j<columnas; j++){
                 Boton boton = new Boton(i, j);
-                boton.setBorder(null);
+                
                 getContentPane().add(boton);
                 arrayBotones[i][j] = boton;
                 boton.addMouseListener(new MouseAdapter() {
@@ -46,44 +51,55 @@ public class VentanaBuscaminas extends javax.swing.JFrame {
                 });
             }
         }
-        ponMinas(30);
+        ponMinas(numeroMinas);
         cuentaMinas();
+        
+//        Timer t = new Timer(1, new ActionListener() {
+//    public void actionPerformed(ActionEvent e) {
+//        repaint();
+//    }
+//});
+//        t.start();
+        
     }
     
     private void botonPulsado(MouseEvent e){
         Boton miBoton = (Boton) e.getComponent();
-        if (e.getButton() == MouseEvent.BUTTON3){
-            miBoton.setText("?");
+        if (e.getButton() == MouseEvent.BUTTON3 && miBoton.isEnabled()){
+            miBoton.setImagen(9);
         }
-//                else{ //versión ITERATIVA del buscaminas. Esta versión NO se puede entregar
+                else{ //versión ITERATIVA del buscaminas. Esta versión NO se puede entregar
                         // porque tienes que entregar la RECURSIVA
-//           //Si es una bomba --> Explota y se acaba el juego.
-//            
-//            //Si no es una bomba
-//            //Si tiene minas alrededor mostramos cuantas
-//            
-//            if(miBoton.getNumeroMinasAlrededor() == 0){
-//                ArrayList<Boton> listaDeCasillasAMirar = new ArrayList();
-//                listaDeCasillasAMirar.add(miBoton);
-//                
-//                while(listaDeCasillasAMirar.size() > 0){
-//                    Boton b = listaDeCasillasAMirar.get(0);
-//                    for(int k = -1; k<2; k++){
-//                        for(int m = -1; m<2; m++){
-//                            if((b.getI() + k >= 0)&&(b.getJ() + m >= 0)&&(b.getI() + k < filas) && (b.getJ() + m < columnas)){
-//                                if(arrayBotones[b.getI() + k][b.getJ() + m].isEnabled()){
-//                                    if(arrayBotones[b.getI() + k][b.getJ() + m].getNumeroMinasAlrededor() == 0){
-//                                        arrayBotones[b.getI() + k][b.getJ() + m].setEnabled(false);
-//                                        listaDeCasillasAMirar.add(arrayBotones[b.getI() + k][b.getJ() + m]);
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                    listaDeCasillasAMirar.remove(b);
-//                } 
-//            }        
-//        }
+           //Si es una bomba --> Explota y se acaba el juego.
+            //Si no es una bomba
+            //Si tiene minas alrededor mostramos cuantas
+
+            if(miBoton.getNumeroMinasAlrededor() == 0){
+                ArrayList<Boton> listaDeCasillasAMirar = new ArrayList();
+                listaDeCasillasAMirar.add(miBoton);
+                
+                while(listaDeCasillasAMirar.size() > 0){
+                    Boton b = listaDeCasillasAMirar.get(0);
+                    for(int k = -1; k<2; k++){
+                        for(int m = -1; m<2; m++){
+                            if((b.getI() + k >= 0)&&(b.getJ() + m >= 0)&&(b.getI() + k < filas) && (b.getJ() + m < columnas)){
+                                if(arrayBotones[b.getI() + k][b.getJ() + m].isEnabled()){
+                                    if(arrayBotones[b.getI() + k][b.getJ() + m].getNumeroMinasAlrededor() == 0){
+                                        arrayBotones[b.getI() + k][b.getJ() + m].setEnabled(false);
+                                        
+                                        listaDeCasillasAMirar.add(arrayBotones[b.getI() + k][b.getJ() + m]);
+                                    }
+                                    else {
+                                        arrayBotones[b.getI() + k][b.getJ() + m].setImagen(arrayBotones[b.getI() + k][b.getJ() + m].getNumeroMinasAlrededor() );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    listaDeCasillasAMirar.remove(b);
+                } 
+            }        
+        }
     }
     
     private void ponMinas(int numeroMinas){
@@ -95,7 +111,7 @@ public class VentanaBuscaminas extends javax.swing.JFrame {
             // seleccionada ya hay una mina, porque en ese caso tiene que 
             // buscar otra
             arrayBotones[f][c].setMina(1);
-            arrayBotones[f][c].setText("m");
+            //arrayBotones[f][c].setText("m");
         }
     }
     
@@ -106,36 +122,26 @@ public class VentanaBuscaminas extends javax.swing.JFrame {
         int minas = 0;
         for (int i=0; i<filas; i++){
             for (int j=0; j<columnas; j++){
-                if ((i>0) && (j>0) && (i < filas-1) && (j<columnas-1)){
-                    minas += arrayBotones[i-1][j-1].getMina(); //la mina de arriba a la izquierda
-                    minas += arrayBotones[i][j-1].getMina(); //la mina de la izquierda
-                    minas += arrayBotones[i+1][j-1].getMina(); //la mina de la abajo izquierda 
-                    
-                    minas += arrayBotones[i-1][j].getMina(); //la mina de encima 
-                    minas += arrayBotones[i+1][j].getMina(); //la mina de abajo 
- 
-                    minas += arrayBotones[i-1][j+1].getMina(); //la mina de arriba a la derecha
-                    minas += arrayBotones[i][j+1].getMina(); //la mina de la derecha
-                    minas += arrayBotones[i+1][j+1].getMina(); //la mina de la abajo derecha
+                for (int k=-1; k<2; k++){
+                    for(int m=-1; m<2; m++){
+                        if ((i+k >= 0) && (j+m >= 0)&&(i+k < filas) && (j+m <columnas)){
+                            minas = minas + arrayBotones[i+k][j+m].getMina();
+                        }
+                    }
                 }
                 arrayBotones[i][j].setNumeroMinasAlrededor(minas);
                 
                 //TODO comentar la siguiente parte para que no aparezcan los números al iniciar la partida
                 if (arrayBotones[i][j].getMina() == 0){
-                    arrayBotones[i][j].setText(String.valueOf(minas));
+                    //arrayBotones[i][j].setText(String.valueOf(minas));
+                    arrayBotones[i][j].setImagen(0);
                 }
                 
                 minas = 0;
                 
                 //uso un bucle anidado para recorrer
                 //las 9 casillas que hay alrededor
-//                for (int k=-1; k<2; k++){
-//                    for(int m=-1; m<2; m++){
-//                        if ((i+k >= 0) && (j+m >= 0)&&(i+k < filas) && (j+m <columnas)){
-//                            minas = minas + arrayBotones[i+k][j+m].getMina();
-//                        }
-//                    }
-//                }
+
                 
             }
         }
